@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BookOpen, Loader2, AlertCircle, Mail, Lock, User, Github, Google } from "lucide-react";
+import { BookOpen, Loader2, AlertCircle, Mail, Lock, User, Github, Globe } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserRole } from "@/contexts/AuthContext";
@@ -192,7 +192,7 @@ const Signup = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" type="button" onClick={handleGoogleSignup} disabled={isSubmitting}>
-                <Google className="mr-2 h-4 w-4" />
+                <Globe className="mr-2 h-4 w-4" />
                 Google
               </Button>
               <Button variant="outline" type="button" disabled={isSubmitting}>
