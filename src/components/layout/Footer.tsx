@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { BookOpen, Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
+import { BookOpen, Facebook, Twitter, Instagram, Linkedin, Youtube, Copyright } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -75,9 +75,12 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              &copy; {currentYear} EduForgeAI. All rights reserved.
-            </p>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Copyright className="h-4 w-4 mr-1.5" />
+              <p>
+                <span className="font-medium">{currentYear} EduForgeAI.</span> All rights reserved. Unauthorized reproduction or distribution of any material on this site is strictly prohibited.
+              </p>
+            </div>
             <div className="mt-4 md:mt-0 flex flex-wrap gap-4 text-sm">
               <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
               <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
