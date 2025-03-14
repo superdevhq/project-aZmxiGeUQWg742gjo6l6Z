@@ -36,6 +36,66 @@ export type Database = {
         }
         Relationships: []
       }
+      courses: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          discount_price: number | null
+          id: string
+          image_url: string | null
+          instructor_id: string | null
+          is_published: boolean | null
+          price: number | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_price?: number | null
+          id?: string
+          image_url?: string | null
+          instructor_id?: string | null
+          is_published?: boolean | null
+          price?: number | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_price?: number | null
+          id?: string
+          image_url?: string | null
+          instructor_id?: string | null
+          is_published?: boolean | null
+          price?: number | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
