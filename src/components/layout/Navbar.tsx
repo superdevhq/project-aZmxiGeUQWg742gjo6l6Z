@@ -1,13 +1,54 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search, BookOpen, User } from "lucide-react";
+import { 
+  Menu, 
+  X, 
+  Search, 
+  BookOpen, 
+  User, 
+  LogOut, 
+  Settings, 
+  BookOpenCheck, 
+  LayoutDashboard,
+  ChevronDown
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuGroup, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
+  const { user, logout, isInstructor, isStudent } = useAuth();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase();
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b">
@@ -24,9 +65,11 @@ const Navbar = () => {
             <Link to="/courses" className="text-foreground/80 hover:text-primary transition-colors">
               Courses
             </Link>
-            <Link to="/teach" className="text-foreground/80 hover:text-primary transition-colors">
-              Teach
-            </Link>
+            {isInstructor() && (
+              <Link to="/instructor/dashboard" className="text-foreground/80 hover:text-primary transition-colors">
+                Teach
+              </Link>
+            )}
             <Link to="/about" className="text-foreground/80 hover:text-primary transition-colors">
               About
             </Link>
@@ -44,12 +87,66 @@ const Navbar = () => {
             >
               <Search className="h-5 w-5" />
             </button>
-            <Link to="/login">
-              <Button variant="outline" size="sm">Log in</Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm">Sign up</Button>
-            </Link>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    {isStudent() && (
+                      <DropdownMenuItem onClick={() => navigate("/my-courses")}>
+                        <BookOpenCheck className="mr-2 h-4 w-4" />
+                        <span>My Courses</span>
+                      </DropdownMenuItem>
+                    )}
+                    {isInstructor() && (
+                      <DropdownMenuItem onClick={() => navigate("/instructor/dashboard")}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Instructor Dashboard</span>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={() => navigate("/settings")}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="sm">Log in</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm">Sign up</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -96,13 +193,15 @@ const Navbar = () => {
               >
                 Courses
               </Link>
-              <Link 
-                to="/teach" 
-                className="px-4 py-2 rounded-md hover:bg-muted transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Teach
-              </Link>
+              {isInstructor() && (
+                <Link 
+                  to="/instructor/dashboard" 
+                  className="px-4 py-2 rounded-md hover:bg-muted transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Teach
+                </Link>
+              )}
               <Link 
                 to="/about" 
                 className="px-4 py-2 rounded-md hover:bg-muted transition-colors"
@@ -117,14 +216,83 @@ const Navbar = () => {
               >
                 Pricing
               </Link>
-              <div className="pt-2 flex flex-col space-y-2">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">Log in</Button>
-                </Link>
-                <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full">Sign up</Button>
-                </Link>
-              </div>
+              
+              {user ? (
+                <>
+                  <div className="pt-2 border-t">
+                    <div className="flex items-center px-4 py-2">
+                      <Avatar className="h-10 w-10 mr-3">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link 
+                    to="/profile" 
+                    className="px-4 py-2 rounded-md hover:bg-muted transition-colors flex items-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Link>
+                  
+                  {isStudent() && (
+                    <Link 
+                      to="/my-courses" 
+                      className="px-4 py-2 rounded-md hover:bg-muted transition-colors flex items-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <BookOpenCheck className="h-4 w-4 mr-2" />
+                      My Courses
+                    </Link>
+                  )}
+                  
+                  {isInstructor() && (
+                    <Link 
+                      to="/instructor/dashboard" 
+                      className="px-4 py-2 rounded-md hover:bg-muted transition-colors flex items-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Instructor Dashboard
+                    </Link>
+                  )}
+                  
+                  <Link 
+                    to="/settings" 
+                    className="px-4 py-2 rounded-md hover:bg-muted transition-colors flex items-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Link>
+                  
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="px-4 py-2 rounded-md hover:bg-muted transition-colors flex items-center w-full text-left"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <div className="pt-2 flex flex-col space-y-2">
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">Log in</Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full">Sign up</Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}
