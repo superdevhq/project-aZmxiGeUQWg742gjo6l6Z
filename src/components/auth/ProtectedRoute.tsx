@@ -1,44 +1,45 @@
 
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requireInstructor?: boolean;
-  requireAdmin?: boolean;
+  requiredRole?: "student" | "instructor" | "admin";
 }
 
-const ProtectedRoute = ({ 
-  children, 
-  requireInstructor = false,
-  requireAdmin = false 
-}: ProtectedRouteProps) => {
-  const { user, isLoading, isInstructor, isAdmin } = useAuth();
-  const location = useLocation();
+const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+  const { user, isLoading, isStudent, isInstructor, isAdmin } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!user) {
-    // Redirect to login page with return URL
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  // Check for instructor role if required
-  if (requireInstructor && !isInstructor()) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+  // If a specific role is required, check for it
+  if (requiredRole) {
+    const hasRequiredRole = 
+      (requiredRole === "student" && isStudent()) ||
+      (requiredRole === "instructor" && isInstructor()) ||
+      (requiredRole === "admin" && isAdmin());
 
-  // Check for admin role if required
-  if (requireAdmin && !isAdmin()) {
-    return <Navigate to="/unauthorized" replace />;
+    if (!hasRequiredRole) {
+      // Redirect to appropriate page based on user's role
+      if (isStudent()) {
+        return <Navigate to="/my-courses" replace />;
+      } else if (isInstructor()) {
+        return <Navigate to="/instructor/dashboard" replace />;
+      } else {
+        return <Navigate to="/" replace />;
+      }
+    }
   }
 
   return <>{children}</>;

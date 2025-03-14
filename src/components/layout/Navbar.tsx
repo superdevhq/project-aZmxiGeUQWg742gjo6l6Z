@@ -12,8 +12,7 @@ import {
   LogOut, 
   Settings, 
   BookOpenCheck, 
-  LayoutDashboard,
-  ChevronDown
+  LayoutDashboard
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
@@ -42,13 +41,29 @@ const Navbar = () => {
     }
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string = "User") => {
     return name
       .split(" ")
       .map(part => part[0])
       .join("")
       .toUpperCase();
   };
+
+  // Get user display name from metadata
+  const getUserName = () => {
+    if (!user) return "User";
+    
+    // Try to get name from user_metadata
+    const metadata = (user as any).user_metadata;
+    if (metadata?.name) return metadata.name;
+    
+    // Fallback to email
+    return user.email?.split('@')[0] || "User";
+  };
+
+  const userName = getUserName();
+  const userEmail = user?.email || "";
+  const userAvatar = (user as any)?.user_metadata?.avatar_url || "";
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b">
@@ -93,17 +108,17 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                      <AvatarImage src={userAvatar} alt={userName} />
+                      <AvatarFallback>{getInitials(userName)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-sm font-medium leading-none">{userName}</p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
+                        {userEmail}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -222,12 +237,12 @@ const Navbar = () => {
                   <div className="pt-2 border-t">
                     <div className="flex items-center px-4 py-2">
                       <Avatar className="h-10 w-10 mr-3">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                        <AvatarImage src={userAvatar} alt={userName} />
+                        <AvatarFallback>{getInitials(userName)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="font-medium">{userName}</p>
+                        <p className="text-sm text-muted-foreground">{userEmail}</p>
                       </div>
                     </div>
                   </div>
