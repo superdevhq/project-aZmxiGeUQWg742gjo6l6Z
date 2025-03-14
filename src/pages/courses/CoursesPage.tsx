@@ -134,14 +134,14 @@ const CoursesPage = () => {
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Category</Label>
                     <Select 
-                      value={selectedCategory || ""} 
-                      onValueChange={(value) => setSelectedCategory(value || null)}
+                      value={selectedCategory || "all"} 
+                      onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="All Categories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Categories</SelectItem>
+                        <SelectItem value="all">All Categories</SelectItem>
                         {categories.map((category) => (
                           <SelectItem key={category} value={category}>{category}</SelectItem>
                         ))}
@@ -153,14 +153,14 @@ const CoursesPage = () => {
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Level</Label>
                     <Select 
-                      value={selectedLevel || ""} 
-                      onValueChange={(value) => setSelectedLevel(value || null)}
+                      value={selectedLevel || "all"} 
+                      onValueChange={(value) => setSelectedLevel(value === "all" ? null : value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="All Levels" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Levels</SelectItem>
+                        <SelectItem value="all">All Levels</SelectItem>
                         {levels.map((level) => (
                           <SelectItem key={level} value={level}>{level}</SelectItem>
                         ))}
